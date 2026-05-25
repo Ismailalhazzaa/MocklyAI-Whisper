@@ -1,5 +1,15 @@
+# أدوات البناء الأساسية (الأهم)
+setuptools>=65.0.0
+wheel>=0.38.0
+
+# متطلبات التطبيق الأساسية
 flask==3.0.0
 gunicorn==21.2.0
+
+# Whisper ومتطلباته (سيتم بناؤها الآن بشكل صحيح)
 openai-whisper==20231117
-torch==2.1.0+cpu --extra-index-url https://download.pytorch.org/whl/cpu
-torchaudio==2.1.0+cpu --extra-index-url https://download.pytorch.org/whl/cpu
+
+# PyTorcp (نسخة CPU لتقليل الحجم)
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.1.0
+torchaudio==2.1.0
