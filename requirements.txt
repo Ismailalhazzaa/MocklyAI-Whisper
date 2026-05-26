@@ -2,6 +2,6 @@ setuptools
 wheel
 flask==3.0.0
 gunicorn==21.2.0
-openai-whisper==20231117
-torch==2.1.0+cpu --extra-index-url https://download.pytorch.org/whl/cpu
-torchaudio==2.1.0+cpu --extra-index-url https://download.pytorch.org/whl/cpu
+openai-whisper
+torch --extra-index-url https://download.pytorch.org/whl/cpu
+torchaudio --extra-index-url https://download.pytorch.org/whl/cpu
