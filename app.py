@@ -11,7 +11,14 @@ FFMPEG_PATH = os.path.join(BASE_DIR, "ffmpeg_bin", "ffmpeg")
 if os.path.exists(FFMPEG_PATH):
     os.environ["PATH"] = os.path.join(BASE_DIR, "ffmpeg_bin") + ":" + os.environ["PATH"]
 
-model = whisper.load_model("small")
+# تحميل الموديل بشكل lazy
+model = None
+
+def get_model():
+    global model
+    if model is None:
+        model = whisper.load_model("small")
+    return model
 
 UPLOAD_FOLDER = "uploads"
 ALLOWED_EXTENSIONS = {
@@ -40,7 +47,7 @@ def transcribe_audio():
         filepath = os.path.join(UPLOAD_FOLDER, filename)
         file.save(filepath)
         os.system(f"ffmpeg -i {filepath} {filepath}.wav")
-        result = model.transcribe(f"{filepath}.wav", language="ar", fp16=False)
+        result = get_model().transcribe(f"{filepath}.wav", language="ar", fp16=False)
         return jsonify({"status": True, "text": result["text"]})
     except Exception as e:
         return jsonify({"status": False, "message": str(e)}), 500
@@ -52,4 +59,4 @@ def transcribe_audio():
             os.remove(wav_path)
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=8000)
