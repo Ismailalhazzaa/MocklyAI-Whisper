@@ -5,3 +5,4 @@ gunicorn==21.2.0
 openai-whisper
 torch --extra-index-url https://download.pytorch.org/whl/cpu
 torchaudio --extra-index-url https://download.pytorch.org/whl/cpu
+imageio[ffmpeg]
