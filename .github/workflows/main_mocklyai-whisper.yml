@@ -1,4 +1,4 @@
-name: Build and deploy Python app to Azure Web App - mocklyai-whisper
+name: Build and deploy Docker image to Azure Web App
 
 on:
   push:
@@ -7,54 +7,25 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python version
-        uses: actions/setup-python@v5
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
         with:
-          python-version: '3.11'
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Install ffmpeg
-        run: sudo apt-get update && sudo apt-get install -y ffmpeg
-
-      - name: Create and start virtual environment and install dependencies
-        run: |
-          python -m venv antenv
-          source antenv/bin/activate
-          pip install -r requirements.txt
-
-      - name: Copy ffmpeg to app directory
-        run: |
-          mkdir -p ffmpeg_bin
-          cp $(which ffmpeg) ffmpeg_bin/
-          cp $(which ffprobe) ffmpeg_bin/
-
-      - name: Upload artifact for deployment jobs
-        uses: actions/upload-artifact@v4
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
         with:
-          name: python-app
-          path: |
-            .
-            !antenv/
-
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    permissions:
-      id-token: write
-      contents: read
-
-    steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v4
-        with:
-          name: python-app
+          context: .
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/mocklyai-whisper:latest
 
       - name: Login to Azure
         uses: azure/login@v2
@@ -65,7 +36,6 @@ jobs:
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
-        id: deploy-to-webapp
         with:
           app-name: 'mocklyai-whisper'
-          slot-name: 'Production'
+          images: 'ghcr.io/${{ github.repository_owner }}/mocklyai-whisper:latest'
